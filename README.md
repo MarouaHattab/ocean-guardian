@@ -22,7 +22,8 @@ Le but de ce jeu est de naviguer dans une zone en 8-bit, en collectant des déch
 ----------------------------
 
 1. Clonez ce projet sur votre machine locale :
-   git clone https://github.com/votre-utilisateur/ocean-guardian.git
+  ```bash
+   git clone https://https://github.com/MarouaHattab/ocean-guardian
 
 2. Ouvrez `index.html` dans votre navigateur préféré pour commencer à jouer.
 
