@@ -18,6 +18,18 @@ Le but de ce jeu est de naviguer dans une zone en 8-bit, en collectant des déch
 - **Affichage des statistiques** : Déchets collectés, Vie marine sauvée et Temps restant.
 - **Indicateur de pollution** pour suivre la progression de la pollution dans l'océan.
 
+🖥️ Installation et Lancement
+----------------------------
+
+1. Clonez ce projet sur votre machine locale :
+  ```bash
+   git clone https://https://github.com/MarouaHattab/ocean-guardian
+   ```
+
+2. Ouvrez `index.html` dans votre navigateur préféré pour commencer à jouer.
+
+   Il n'est pas nécessaire d'installer des outils supplémentaires, car ce projet utilise **HTML**, **CSS** et **JavaScript** pur, avec un peu de **Tailwind CSS** pour le style.
+
 🎮 Comment Jouer
 ----------------
 
@@ -47,13 +59,8 @@ Le but de ce jeu est de naviguer dans une zone en 8-bit, en collectant des déch
 - **Développeur** : [Maroua Hattab](https://github.com/MarouaHattab)
 - **Police utilisée** : [Press Start 2P](https://fonts.google.com/specimen/Press+Start+2P)
 
-🖥️ Installation et Lancement
-----------------------------
+💬 Contact
+----------
 
-1. Clonez ce projet sur votre machine locale :
-  ```bash
-   git clone https://https://github.com/MarouaHattab/ocean-guardian
+Pour toute question ou suggestion, vous pouvez me contacter via mon profil GitHub .
 
-2. Ouvrez `index.html` dans votre navigateur préféré pour commencer à jouer.
-
-   Il n'est pas nécessaire d'installer des outils supplémentaires, car ce projet utilise **HTML**, **CSS** et **JavaScript** pur, avec un peu de **Tailwind CSS** pour le style.
