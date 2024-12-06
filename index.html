@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ocean Guardian - Sauvons les Océans!</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #000;
+            color: #0F0;
+            font-family: 'Press Start 2P', cursive;
+            user-select: none;
+        }
+        .pixel-border {
+            border: 4px solid #0F0;
+            box-shadow: 0 0 10px #0F0;
+        }
+        .pixel-text {
+            text-shadow: 2px 2px #0A0;
+        }
+        .game-screen {
+            position: relative;
+            image-rendering: pixelated;
+            background-color: #001010;
+            overflow: hidden;
+            width: 100%;
+            height: 400px;
+            border: 2px solid #0F0;
+        }
+        .player {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 32px;
+            transition: transform 0.1s linear;
+            z-index: 10;
+        }
+        .game-object {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 32px;
+            transition: transform 0.2s ease;
+            z-index: 5;
+        }
+        .difficulty-btn {
+            margin: 0 5px;
+            padding: 5px 10px;
+            background-color: #2563eb;
+            color: white;
+            border-radius: 5px;
+        }
+        .difficulty-btn.active {
+            background-color: #10b981;
+        }
+    </style>
+</head>
+<body class="bg-black text-green-500 p-4">
+    <div class="container mx-auto pixel-border p-4">
+        <h1 class="text-4xl text-center mb-8 pixel-text">🌊 OCEAN GUARDIAN 🐳</h1>
+        
+        <div class="grid md:grid-cols-2 gap-4">
+            <div class="pixel-border p-4 game-screen relative" id="gameArea">
+                <div id="player" class="player">⛵</div>
+            </div>
+            
+            <div class="pixel-border p-4">
+                <h2 class="text-2xl mb-4">🎮 Mission de Conservation</h2>
+                <div id="missionDetails" class="space-y-4">
+                    <p class="text-sm">Utilisez les flèches du clavier pour vous déplacer</p>
+                    <div class="flex justify-between">
+                        <span>Déchets Collectés:</span>
+                        <span id="trashCollected">0</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Vie Marine Sauvée:</span>
+                        <span id="marineLivesSaved">0</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Temps Restant:</span>
+                        <span id="timeRemaining">180</span>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <h3 class="text-xl mb-2">🛡️ Niveau de Pollution</h3>
+                    <div class="w-full bg-gray-700 h-4 rounded-full">
+                        <div id="pollutionLevel" class="bg-red-500 h-4 rounded-full" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="mt-4 text-center">
+                    <h3 class="text-xl mb-2">🎚️ Difficulté</h3>
+                    <div>
+                        <button id="easyBtn" class="difficulty-btn active">Facile</button>
+                        <button id="mediumBtn" class="difficulty-btn">Moyen</button>
+                        <button id="hardBtn" class="difficulty-btn">Difficile</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-8 text-center">
+            <div class="space-x-4">
+                <button id="startGameBtn" class="bg-green-700 text-white px-4 py-2 rounded hover:bg-green-600">
+                    Commencer la Mission
+                </button>
+                <button id="pauseGameBtn" class="bg-yellow-700 text-white px-4 py-2 rounded hover:bg-yellow-600" disabled>
+                    Pause
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const gameArea = document.getElementById('gameArea');
+        const player = document.getElementById('player');
+        const trashCollectedEl = document.getElementById('trashCollected');
+        const marineLivesSavedEl = document.getElementById('marineLivesSaved');
+        const pollutionLevelEl = document.getElementById('pollutionLevel');
+        const timeRemainingEl = document.getElementById('timeRemaining');
+        const startGameBtn = document.getElementById('startGameBtn');
+        const pauseGameBtn = document.getElementById('pauseGameBtn');
+
+        // Difficulty buttons
+        const easyBtn = document.getElementById('easyBtn');
+        const mediumBtn = document.getElementById('mediumBtn');
+        const hardBtn = document.getElementById('hardBtn');
+
+        // Difficulty settings
+        const difficulties = {
+            easy: { 
+                gameTime: 240, 
+                pollutionSpeed: 0.5, 
+                objectCount: 10,
+                playerSpeed: 15
+            },
+            medium: { 
+                gameTime: 180, 
+                pollutionSpeed: 1, 
+                objectCount: 15,
+                playerSpeed: 10
+            },
+            hard: { 
+                gameTime: 120, 
+                pollutionSpeed: 2, 
+                objectCount: 20,
+                playerSpeed: 8
+            }
+        };
+
+        let currentDifficulty = 'medium';
+        let playerX = 0, playerY = 0;
+        let gameActive = false;
+        let trashCollected = 0;
+        let marineLivesSaved = 0;
+        let pollutionLevel = 0;
+        let timeRemaining;
+        let gameTimer;
+        let pollutionTimer;
+        let gameSpeed;
+
+        // Trash and marine life emojis
+        const trashEmojis = ['🚯', '🗑️', '🥤', '🍾', '📦'];
+        const marineLifeEmojis = ['🐠', '🐬', '🐳', '🐙', '🦈', '🦀', '🐡'];
+
+        // Difficulty selection
+        [easyBtn, mediumBtn, hardBtn].forEach(btn => {
+            btn.addEventListener('click', () => {
+                [easyBtn, mediumBtn, hardBtn].forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentDifficulty = btn.id.replace('Btn', '');
+            });
+        });
+
+        function getRandomEmoji(emojiArray) {
+            return emojiArray[Math.floor(Math.random() * emojiArray.length)];
+        }
+
+        function createGameObject(type) {
+            const obj = document.createElement('div');
+            obj.classList.add('game-object', type);
+            
+            const maxX = gameArea.clientWidth - 40;
+            const maxY = gameArea.clientHeight - 40;
+            
+            obj.style.left = `${Math.random() * maxX}px`;
+            obj.style.top = `${Math.random() * maxY}px`;
+            
+            obj.textContent = type === 'trash' 
+                ? getRandomEmoji(trashEmojis) 
+                : getRandomEmoji(marineLifeEmojis);
+            
+            gameArea.appendChild(obj);
+            return obj;
+        }
+
+        function startGame() {
+            if (!gameActive) {
+                const difficulty = difficulties[currentDifficulty];
+                timeRemaining = difficulty.gameTime;
+                gameSpeed = difficulty.playerSpeed;
+
+                document.querySelectorAll('.game-object').forEach(el => el.remove());
+                
+                playerX = 0;
+                playerY = 0;
+                player.style.transform = 'translate(0px, 0px)';
+                
+                
+                trashCollected = 0;
+                marineLivesSaved = 0;
+                pollutionLevel = 0;
+
+                trashCollectedEl.textContent = trashCollected;
+                marineLivesSavedEl.textContent = marineLivesSaved;
+                pollutionLevelEl.style.width = '0%';
+                timeRemainingEl.textContent = timeRemaining;
+
+                for (let i = 0; i < difficulty.objectCount; i++) {
+                    createGameObject('trash');
+                    createGameObject('marine-life');
+                }
+
+                startGameBtn.disabled = true;
+                pauseGameBtn.disabled = false;
+
+                gameActive = true;
+
+                // Timers
+                gameTimer = setInterval(() => {
+                    timeRemaining--;
+                    timeRemainingEl.textContent = timeRemaining;
+                    
+                    if (timeRemaining <= 0) {
+                        endGame(true);
+                    }
+                }, 1000);
+
+                pollutionTimer = setInterval(() => {
+                    pollutionLevel += difficulty.pollutionSpeed;
+                    pollutionLevelEl.style.width = `${Math.min(pollutionLevel, 100)}%`;
+
+                    if (pollutionLevel >= 100) {
+                        endGame(false);
+                    }
+                }, 1000);
+            }
+        }
+
+        function endGame(success) {
+            // Stop timers
+            clearInterval(gameTimer);
+            clearInterval(pollutionTimer);
+            gameActive = false;
+
+            const difficulty = difficulties[currentDifficulty];
+            const difficultyMultiplier = {easy: 1, medium: 1.5, hard: 2}[currentDifficulty];
+            const score = Math.round(((trashCollected * 10) + (marineLivesSaved * 20)) * difficultyMultiplier);
+
+            const message = success 
+                ? `🏆 Mission Accomplie! \n\nDifficulté: ${currentDifficulty.charAt(0).toUpperCase() + currentDifficulty.slice(1)}\nScore: ${score} points\nDéchets Collectés: ${trashCollected}\nVie Marine Sauvée: ${marineLivesSaved}` 
+                : `❌ Mission Échouée! \n\nLa pollution a atteint un niveau critique.\n\nDifficulté: ${currentDifficulty.charAt(0).toUpperCase() + currentDifficulty.slice(1)}\nScore: ${score} points`;
+
+            startGameBtn.disabled = false;
+            pauseGameBtn.disabled = true;
+
+            alert(message);
+        }
+
+        function pauseGame() {
+            if (gameActive) {
+                gameActive = false;
+                clearInterval(gameTimer);
+                clearInterval(pollutionTimer);
+                alert('Jeu en Pause. Cliquez sur OK pour continuer.');
+                startGame(); // Resume game
+            }
+        }
+
+        startGameBtn.addEventListener('click', startGame);
+        pauseGameBtn.addEventListener('click', pauseGame);
+
+        document.addEventListener('keydown', (e) => {
+            if (!gameActive) return;
+
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                e.preventDefault();
+            }
+
+
+            switch(e.key) {
+                case 'ArrowLeft': 
+                    playerX = Math.max(0, playerX - gameSpeed); 
+                    break;
+                case 'ArrowRight': 
+                    playerX = Math.min(gameArea.clientWidth - 40, playerX + gameSpeed); 
+                    break;
+                case 'ArrowUp': 
+                    playerY = Math.max(0, playerY - gameSpeed); 
+                    break;
+                case 'ArrowDown': 
+                    playerY = Math.min(gameArea.clientHeight - 40, playerY + gameSpeed); 
+                    break;
+            }
+            player.style.transform = `translate(${playerX}px, ${playerY}px)`;
+
+            const playerRect = player.getBoundingClientRect();
+            const gameAreaRect = gameArea.getBoundingClientRect();
+
+            document.querySelectorAll('.game-object').forEach(obj => {
+                const objRect = obj.getBoundingClientRect();
+                
+                if (
+                    playerRect.left < objRect.right &&
+                    playerRect.right > objRect.left &&
+                    playerRect.top < objRect.bottom &&
+                    playerRect.bottom > objRect.top
+                ) {
+                    if (obj.classList.contains('trash')) {
+                        obj.remove();
+                        trashCollected++;
+                        trashCollectedEl.textContent = trashCollected;
+                        createGameObject('trash');
+                    } else if (obj.classList.contains('marine-life')) {
+                        obj.remove();
+                        marineLivesSaved++;
+                        marineLivesSavedEl.textContent = marineLivesSaved;
+                        createGameObject('marine-life');
+                        pollutionLevel = Math.max(0, pollutionLevel - 5);
+                        pollutionLevelEl.style.width = `${pollutionLevel}%`;
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
