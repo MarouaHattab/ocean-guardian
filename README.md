@@ -1,6 +1,4 @@
-![Ocean Guardian Logo](images/src.png)
-  
-🌊 Ocean Guardian - Sauvons les Océans! 🎮  
+  🌊 Ocean Guardian - Sauvons les Océans! 🎮  
 =========================================
 
 Bienvenue dans **Ocean Guardian**, un jeu rétro où vous prenez le rôle d'un gardien des océans, chargé de collecter des déchets et de sauver la vie marine tout en luttant contre la pollution croissante. Ce projet allie des éléments de rétro-gaming et une mission écologique pour sensibiliser à la préservation de nos océans.
@@ -18,6 +16,8 @@ Le but de ce jeu est de naviguer dans une zone en 8-bit, en collectant des déch
 - **Mission de conservation** où vous devez collecter des déchets tout en sauvant la vie marine.
 - **Affichage des statistiques** : Déchets collectés, Vie marine sauvée et Temps restant.
 - **Indicateur de pollution** pour suivre la progression de la pollution dans l'océan.
+
+![Ocean Guardian Logo](images/src.png)
 
 🖥️ Installation et Lancement
 ----------------------------
