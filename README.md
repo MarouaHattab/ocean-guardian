@@ -1,4 +1,5 @@
-    
+![Ocean Guardian Logo](images/src.png)
+  
 🌊 Ocean Guardian - Sauvons les Océans! 🎮  
 =========================================
 
